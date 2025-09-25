@@ -1,0 +1,212 @@
+Claro, aquí tienes el código organizado y limpio para que puedas ver claramente los atributos, métodos y la jerarquía de cada clase. He eliminado los sellos (`stamp`), comentarios, y las declaraciones de paquete, y he agrupado los métodos por clase para una mejor lectura.
+
+```
+Object subclass: #AlgoConsejo
+	instanceVariableNames: 'criterio futbolistas'
+	
+	methods
+		initialize
+			futbolistas := OrderedCollection new.
+		
+		setCriterio: unCriterio
+			criterio := Criterio definir: unCriterio.
+		
+		obtenerFutbolistaSegunCriterio
+			| futbolistEncontrado |
+			futbolistEncontrado := futbolistas inject: futbolistas first into: [ :mejor :actual |
+				(criterio comparar: actual con: mejor)
+			].
+			^futbolistEncontrado nombre.
+		
+		valorDe: unNombre
+			| futbolsitaEncontrado |
+			futbolsitaEncontrado := futbolistas detect: [ :futbolista | futbolista tuNombreEs: unNombre ].
+			^futbolsitaEncontrado valor.
+		
+		registrarFutbolistaConNombre: unNombre dePeso: unPeso yAltura: unaAltura yEdad: unaEdad yProvenienteDelClub: unClub DePais: unPais
+			| unFutbolista |
+			unFutbolista := Futbolista new.
+			unFutbolista deNombre: unNombre dePeso: unPeso deAltura: unaAltura deEdad: unaEdad deClub: unClub dePais: unPais.
+			futbolistas add: unFutbolista.
+
+
+Object subclass: #Clubes
+	instanceVariableNames: 'confedereaciones nombreClub porcentaje'
+	
+	methods
+		conClub: unClub
+			nombreClub := unClub.
+		
+		aplicarPorcentaje: unValor
+			unValor multiplicar: porcentaje.
+		
+		getPorcentaje
+			^porcentaje.
+	
+	class methods
+		conClub: unClub yPais: unPais
+			| mapa claseDestino clubRetornado |
+			mapa := Dictionary newFrom: {
+				'Argentina' -> ClubArgentino.
+				'Brasil' -> ClubConmebol.
+				'Chile' -> ClubConmebol.
+				'España' -> ClubEuropeo.
+				'Italia' -> ClubEuropeo
+			}.
+			claseDestino := mapa at: unPais ifAbsent: [ ClubEuropeo ].
+			clubRetornado := claseDestino new.
+			clubRetornado conClub: unClub.
+			^clubRetornado.
+
+
+Clubes subclass: #ClubArgentino
+	instanceVariableNames: ''
+	
+	methods
+		initialize
+			porcentaje := 1.1.
+
+
+Clubes subclass: #ClubConmebol
+	instanceVariableNames: ''
+	
+	methods
+		initialize
+			porcentaje := 1.25.
+
+
+Clubes subclass: #ClubEuropeo
+	instanceVariableNames: ''
+	
+	methods
+		initialize
+			porcentaje := 1.5.
+
+
+Object subclass: #Criterio
+	instanceVariableNames: ''
+	
+	methods
+		comparar: unFutbolista con: otroFutbolista
+			self subclassResponsibility.
+	
+	class methods
+		definir: unCriterio
+			^ (unCriterio = 'Caro')
+				ifTrue: [ CriterioCaro new ]
+				ifFalse: [ CriterioBarato new ].
+
+
+Criterio subclass: #CriterioBarato
+	instanceVariableNames: ''
+	
+	methods
+		comparar: unFutbolista con: otroFutbolista
+			(unFutbolista valeMasQue: otroFutbolista) ifTrue: [
+				^otroFutbolista
+			].
+			^ unFutbolista.
+
+
+Criterio subclass: #CriterioCaro
+	instanceVariableNames: ''
+	
+	methods
+		comparar: unFutbolista con: otroFutbolista
+			(unFutbolista valeMasQue: otroFutbolista) ifTrue: [ ^unFutbolista ].
+			^otroFutbolista.
+
+
+Object subclass: #Edad
+	instanceVariableNames: 'edad'
+	
+	methods
+		calcularCon: peso yAltura: altura
+			self subclassResponsibility.
+		
+		definirEdad: unaEdad
+			edad := unaEdad.
+	
+	class methods
+		conEdad: unaEdad
+			| edadRetornada |
+			edadRetornada := (unaEdad >= 33)
+				ifTrue: [ EdadMayor new ]
+				ifFalse: [ EdadMenor new ].
+			edadRetornada definirEdad: unaEdad.
+			^edadRetornada.
+
+
+Edad subclass: #EdadMayor
+	instanceVariableNames: ''
+	
+	methods
+		calcularCon: peso yAltura: altura
+			^(100 * peso * (altura sqrt) / (edad raisedToInteger: 3)).
+
+
+Edad subclass: #EdadMenor
+	instanceVariableNames: ''
+	
+	methods
+		calcularCon: peso yAltura: altura
+			^((peso * altura) / edad).
+
+
+Object subclass: #Futbolista
+	instanceVariableNames: 'nombre peso altura edad club pais'
+	
+	methods
+		valor
+			| valor |
+			valor := Valor new.
+			valor calcularConPeso: peso altura: altura edad: edad.
+			club aplicarPorcentaje: valor.
+			^valor.
+		
+		tuNombreEs: unNombre
+			^nombre = unNombre.
+		
+		nombre
+			^nombre.
+		
+		tieneValorMenorIgualQue: unValor
+			^unValor esMayorQue: (self valor).
+		
+		deNombre: unNombre dePeso: unPeso deAltura: unaAltura deEdad: unaEdad deClub: unClub dePais: unPais
+			nombre := unNombre.
+			peso := unPeso.
+			altura := unaAltura.
+			edad := Edad conEdad: unaEdad.
+			club := Clubes conClub: unClub yPais: unPais.
+			pais := unPais.
+		
+		valeMasQue: otroFutbolista
+			^otroFutbolista tieneValorMenorIgualQue: (self valor).
+
+
+Object subclass: #Valor
+	instanceVariableNames: 'valor'
+	
+	methods
+		compararCon: valorEsperado precision: presicion
+			^(valor < (valorEsperado + presicion)) & (valor > (valorEsperado - presicion)).
+		
+		multiplicar: unPorcentaje
+			valor := valor * unPorcentaje.
+		
+		calcularConPeso: peso altura: altura edad: edad
+			valor := edad calcularCon: peso yAltura: altura.
+		
+		esMayorQue: otroValor
+			(otroValor esMayor: valor) ifTrue: [ ^false ].
+			^true.
+		
+		compararConValorEnReales: valorEsperado precision: presicion
+			| valorReal |
+			valorReal := valor / 245.
+			^(valorReal < (valorEsperado + presicion)) & (valorReal > (valorEsperado - presicion)).
+		
+		esMayor: unNumero
+			^valor > unNumero.
+```

@@ -1,0 +1,43 @@
+@startuml
+
+Title Futbolsita debe calcular su valor.
+
+actor user
+
+    activate Futbolsita
+        user -> Futbolsita:deNombre('Marco Pellegrino',75,1.8,25,'Colo Colo','Chile').
+
+        activate Edad 
+            Futbolsita -> Edad:conEdad(25)
+            Edad --> Futbolsita:EdadMenor 
+        deactivate Edad
+
+        activate Clubes 
+            Futbolsita -> Clubes:ConClubyPais('ColoColo','Chile')
+            Clubes  --> Futbolsita:ClubConmebol
+        deactivate Clubes
+
+        user -> Futbolsita:valor()
+
+        activate Valor
+            Futbolsita -> Valor:calcularConPesoAlturaYedad(75,1.8,EdadMenor(25))
+
+            Valor -> Edad:calcularConPesoAltura(75,1.8)
+            activate Edad
+                Edad --> Valor:Valor = (1.8*75)/25
+            deactivate Edad
+
+            Valor --> Futbolsita:Valor
+
+            Futbolsita->Clubes:aplicarPorcentaje(Valor)
+            activate Clubes
+                Clubes->Valor:multiplicar(porcentaje)
+            deactivate Clubes
+
+            Futbolsita-->user:Valor
+        deactivate Valor
+
+
+    deactivate Futbolsita
+
+@enduml

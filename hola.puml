@@ -1,0 +1,95 @@
+@startuml
+class AlgoConsejo{
+    initialize()
+    setCriterio(unCriterio:Criterio)
+    obtenerFutbolistaSegunCriterio()
+    valorDe(unNombre)
+	registrarFutbolistaConNombre(unNombre,unPeso,unaAltura,unaEdad,unClub,unPais)
+}
+
+class Clubes {
+    {static} unClubyPais(unClub:string,unPais:string)
+    nombreClub:String
+    porcentaje:int
+    conClub(unClub:String)
+    aplicarPorcentaje(unValor:Valor)
+    getPorcentaje()
+
+}
+class ClubArgentino{
+    initialize()
+}
+class ClubConmebol{
+    initialize()
+}
+class ClubEuropeo{
+    initialize()
+}
+
+abstract Criterio {
+    {static} definir(unCriterio:String)
+     compararCon(unFutbolista,otroFutbolista)
+    
+}
+class CriterioBarato {
+
+}
+class CriterioCaro {
+   
+}
+
+abstract Edad{
+    edad:Int
+    {static} conEdad(unaEdad:int)
+    calcularCon(peso:Int,altura:Float)
+}
+class EdadMayor{
+}
+class EdadMenor{  
+}
+
+class Futbolista{
+    nombre:string
+    altura:Float
+    peso:int 
+    valor():Valor
+    tuNombreEs(unNonbre:str):bool
+    tieneValorMenorIgualQue(unValor:Valor):bool
+    valeMasQue(otroFutbolista):bool
+    deNombre(unNombre,unPeso,unaAltura,unaEdad,unClub,unPais)
+
+}
+
+class Valor{
+    compararCon(valorEsperado,presicion):bool
+    multiplicar(unPorcentaje)
+    calcularCon(peso:int,altura:float)
+    esMayorQue(otroValor):bool
+    compararConValorEnReales(valorEsperado:float,presicion:float):bool
+    esMayor(unNumero:float):bool
+}
+
+
+Clubes <|-- ClubArgentino
+Clubes <|-- ClubConmebol
+Clubes <|-- ClubEuropeo
+
+Criterio <|-- CriterioBarato
+Criterio <|-- CriterioCaro
+
+Edad <|-- EdadMayor
+Edad <|-- EdadMenor
+
+AlgoConsejo "1" o-- "*" Futbolista :contiene >
+AlgoConsejo "1" --> "1" Criterio:usa
+
+Futbolista --> Clubes:pertence 
+Futbolista --> Edad:tiene 
+Futbolista --> Valor: calcula
+
+Clubes ..> Valor:aplica%
+
+Valor ...> Edad:usa
+Futbolista ... Criterio:Compara
+
+@enduml

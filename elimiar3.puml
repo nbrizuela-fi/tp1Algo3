@@ -1,0 +1,51 @@
+@startuml
+title Buscar un Futbolista segun un Criterio
+
+actor user 
+
+user -> AlgoConsejo:obtenerFutbolistaSegunCriterio
+activate AlgoConsejo
+
+    loop con cada Futbolista
+    
+    AlgoConsejo->Criterio:comparar(unFutbolista,otroFutbolista)
+    activate Criterio
+        
+        Criterio -> Futbolista: valeMasQue(otroFutbolista:Futbolista)
+        activate Futbolista
+
+
+            Futbolista -> Futbolista:tieneValorMenorIgualQue(Valor)
+            activate Futbolista
+                Futbolista->Valor: esMayorQue(unValor:Valor)
+                    
+                    activate Valor
+                        Valor->Valor:esMayor(valor:int)
+                        
+                        
+                        activate Valor
+                            Valor --> Valor:bool
+                        deactivate Valor
+
+                        Valor -->Futbolista: bool
+                    deactivate Valor
+
+                Futbolista-->Futbolista:bool
+            
+            deactivate Futbolista
+
+            Futbolista -->Criterio:bool
+
+
+        deactivate Futbolista
+
+        Criterio-->AlgoConsejo:FutbolistaSegunCriterio
+
+    deactivate Criterio
+
+    end
+    AlgoConsejo--> user:Futbolista
+deactivate AlgoConsejo
+
+
+@enduml
